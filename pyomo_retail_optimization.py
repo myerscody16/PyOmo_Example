@@ -8,13 +8,13 @@ import os
 model = pyo.ConcreteModel(name="Retail_Store_Location")
 
 # Locations with customer demand that dont have stores
-set_I = pd.read_csv('data/RetailStores-Set I.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
+customer_demand = pd.read_csv('data/RetailStores-Set I.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
 # Potential locations of new stores
-set_J = pd.read_csv('data/RetailStores-Set J.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
+potential_new_stores = pd.read_csv('data/RetailStores-Set J.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
 # List of existing stores
-set_M = pd.read_csv('data/RetailStores-Set M.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
-# 
-set_S = pd.read_csv('data/RetailStores-Set S.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
+all_existing_locations = pd.read_csv('data/RetailStores-Set M.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
+# Customer demographics
+demographics = pd.read_csv('data/RetailStores-Set S.csv', skiprows=1, header=None, usecols=[0])[0].tolist()
 
 # h_is: i = demand location, s = customer segment, value = quantity
 # d_ij: i = demand location, j = store location, value = distance
@@ -23,14 +23,14 @@ h_is = pd.read_csv('data/RetailStores-h_is.csv', skiprows=1, names=['i', 's', 'v
 d_ij = pd.read_csv('data/RetailStores-d_ij.csv', skiprows=1, names=['i', 'j', 'value']).set_index(['i', 'j'])['value'].to_dict()
 v_j0 = pd.read_csv('data/RetailStores-V_j=0.csv', skiprows=2, names=['i', 'value']).set_index('i')['value'].to_dict()
 
-existing_stores = [j for j in set_M if str(j).startswith('E')]
-competitor_stores = [j for j in set_M if str(j).startswith('C')]
-potential_new_locations = [j for j in set_M if str(j).startswith('P')]
+existing_stores = [j for j in all_existing_locations if str(j).startswith('E')]
+competitor_stores = [j for j in all_existing_locations if str(j).startswith('C')]
+potential_new_locations = [j for j in all_existing_locations if str(j).startswith('P')]
 
 # Categories in the data
-model.I = pyo.Set(initialize=set_I)
-model.J = pyo.Set(initialize=set_J)
-model.S = pyo.Set(initialize=set_S)
+model.I = pyo.Set(initialize=customer_demand)
+model.J = pyo.Set(initialize=potential_new_stores)
+model.S = pyo.Set(initialize=demographics)
 model.E = pyo.Set(initialize=existing_stores)
 model.C = pyo.Set(initialize=competitor_stores)
 model.P = pyo.Set(initialize=potential_new_locations)
